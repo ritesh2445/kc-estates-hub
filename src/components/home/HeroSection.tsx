@@ -1,6 +1,7 @@
 import { Search, MapPin, Home, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const propertyTypes = ["All", "Residential", "Commercial", "Land", "Rental"];
 const budgetRanges = [
@@ -13,10 +14,19 @@ const budgetRanges = [
 ];
 
 export function HeroSection() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"buy" | "rent">("buy");
   const [propertyType, setPropertyType] = useState("All");
   const [budget, setBudget] = useState("Any Budget");
+  const [location, setLocation] = useState("");
 
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    params.set("type", activeTab);
+    if (propertyType !== "All") params.set("category", propertyType.toLowerCase());
+    if (location) params.set("q", location);
+    navigate(`/listings?${params.toString()}`);
+  };
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background */}
@@ -92,6 +102,8 @@ export function HeroSection() {
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                   placeholder="Enter location, city, or area"
                   className="w-full pl-10 pr-4 py-3 bg-muted border-0 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
@@ -127,7 +139,7 @@ export function HeroSection() {
               </div>
 
               {/* Search Button */}
-              <Button className="btn-hero md:px-8">
+              <Button className="btn-hero md:px-8" onClick={handleSearch}>
                 <Search className="w-5 h-5 md:mr-2" />
                 <span className="hidden md:inline">Search</span>
               </Button>
